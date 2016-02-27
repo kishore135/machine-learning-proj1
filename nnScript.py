@@ -2,7 +2,6 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.io import loadmat
 from math import sqrt
-import math
 
 
 def initializeWeights(n_in,n_out):
@@ -28,7 +27,7 @@ def sigmoid(z):
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
     
-    return  1 / (1 + math.exp(-z))
+    return  #your code here
     
     
 
@@ -36,21 +35,21 @@ def preprocess():
     """ Input:
      Although this function doesn't have any input, you are required to load
      the MNIST data set from file 'mnist_all.mat'.
- 
+
      Output:
-     train_data: matrix of training set. Each row of train_data contains
+     train_data: matrix of training set. Each row of train_data contains 
        feature vector of a image
      train_label: vector of label corresponding to each image in the training
        set
-     validation_data: matrix of training set. Each row of validation_data
+     validation_data: matrix of training set. Each row of validation_data 
        contains feature vector of a image
-     validation_label: vector of label corresponding to each image in the
+     validation_label: vector of label corresponding to each image in the 
        training set
-     test_data: matrix of training set. Each row of test_data contains
+     test_data: matrix of training set. Each row of test_data contains 
        feature vector of a image
      test_label: vector of label corresponding to each image in the testing
        set
- 
+
      Some suggestions for preprocessing step:
      - divide the original data set to training, validation and testing set
            with corresponding labels
@@ -58,140 +57,179 @@ def preprocess():
            function
      - normalize the data to [0, 1]
      - feature selection"""
-   
+    
     mat = loadmat('D:\mnist_all.mat') #loads the MAT object as a Dictionary
-   
+    
     #Pick a reasonable size for validation data
-   
+    
     
     #Your code here
-   
+    
     train_data = np.array([])
     train_label = np.array([])
     validation_data = np.array([])
     validation_label = np.array([])
     test_data = np.array([])
     test_label = np.array([])
+
+    """
+    arr3 = np.array([]) 
        
+    arr = [1,2,3]
+    print "Arr:"
+    print arr
+    
+    #for i in range(0,3):
+    #arr3 = np.vstack([arr3,arr])
+    #print arr3
+    arr3 = np.append([arr3],[arr])
+    print arr3
+    arr3 = np.append(arr3,arr)
+    print arr3
+    arr3.resize(2,3) 
+    print arr3  
+    print "-----------------blah"
+    print "Arr3:"
+    print arr3
+    print arr3.dtype
+    print arr3[0:1]
+    """
+    
     train_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
-    print "\n\nThe stacked training data is:"
+    print "\nThe stacked training data is:"
     print train_data
-    print "The size of stacked training data is:"
+    print "\nThe size of stacked training data is:"
     print len(train_data)
-  
-    array0 = [1,0,0,0,0,0,0,0,0,0]
-    array1 = [0,1,0,0,0,0,0,0,0,0]
-    array2 = [0,0,1,0,0,0,0,0,0,0]
-    array3 = [0,0,0,1,0,0,0,0,0,0]
-    array4 = [0,0,0,0,1,0,0,0,0,0]
-    array5 = [0,0,0,0,0,1,0,0,0,0]
-    array6 = [0,0,0,0,0,0,1,0,0,0]
-    array7 = [0,0,0,0,0,0,0,1,0,0]
-    array8 = [0,0,0,0,0,0,0,0,1,0]
-    array9 = [0,0,0,0,0,0,0,0,0,1]
-                       
+   
+    digits = ["1000000000","0100000000","0010000000","0001000000","0000100000","0000010000","0000001000","0000000100","0000000010","0000000001"]
+                        
     for i in range(0,len(mat['train0'])):
-       
-        train_label=np.append(train_label,array0);
+        
+        train_label=np.append(train_label,digits[0]); 
         
     for i in range(0,len(mat['train1'])):
-       
-        train_label=np.append(train_label,array1);
-       
+        
+        train_label=np.append(train_label,digits[1]);
+        
     for i in range(0,len(mat['train2'])):
-       
-        train_label=np.append(train_label,array2);
-       
+        
+        train_label=np.append(train_label,digits[2]);
+        
     for i in range(0,len(mat['train3'])):
-       
-        train_label=np.append(train_label,array3);
-       
+        
+        train_label=np.append(train_label,digits[3]);
+        
     for i in range(0,len(mat['train4'])):
-       
-        train_label=np.append(train_label,array4);
-       
+        
+        train_label=np.append(train_label,digits[4]);
+        
     for i in range(0,len(mat['train5'])):
-       
-        train_label=np.append(train_label,array5);
-       
+        
+        train_label=np.append(train_label,digits[5]);
+        
     for i in range(0,len(mat['train6'])):
-       
-        train_label=np.append(train_label,array6);
-       
+        
+        train_label=np.append(train_label,digits[6]);
+        
     for i in range(0,len(mat['train7'])):
-       
-        train_label=np.append(train_label,array7);
-       
+        
+        train_label=np.append(train_label,digits[7]);
+        
     for i in range(0,len(mat['train8'])):
-       
-        train_label=np.append(train_label,array8);
-       
+        
+        train_label=np.append(train_label,digits[8]);
+        
     for i in range(0,len(mat['train9'])):
-       
-        train_label=np.append(train_label,array9);
-   
-    train_label.resize(60000,10)
-    print "The training data true labels are:"
+        
+        train_label=np.append(train_label,digits[9]);
+    
+    #train_label.resize(60000,10)
+    
+    print "\nThe training data true labels are:"
     print train_label
-    print "The size of training data true labels is:"
+    print "\nThe size of training data true labels is:"
     print len(train_label)
-   
-    """
+    
     test_data = np.vstack((mat['test0'],mat['test1'],mat['test2'],mat['test3'],mat['test4'],mat['test5'],mat['test6'],mat['test7'],mat['test8'],mat['test9']))
-    print "The stacked test data is:"
+    print "\nThe stacked test data is:"
     print test_data
-    print "The size of stacked training data is:"
+    print "\nThe size of stacked training data is:"
     print len(test_data)
-   
+    
     for i in range(0,len(mat['test0'])):
-       
-        test_label=np.append(test_label,0);
+        
+        test_label=np.append(test_label,digits[0]); 
         
     for i in range(0,len(mat['test1'])):
-       
-        test_label=np.append(test_label,1);
-       
+        
+        test_label=np.append(test_label,digits[1]);
+        
     for i in range(0,len(mat['test2'])):
-       
-        test_label=np.append(test_label,2);
-       
+        
+        test_label=np.append(test_label,digits[2]);
+        
     for i in range(0,len(mat['test3'])):
-       
-        test_label=np.append(test_label,3);
-       
+        
+        test_label=np.append(test_label,digits[3]);
+        
     for i in range(0,len(mat['test4'])):
-       
-        test_label=np.append(test_label,4);
-       
+        
+        test_label=np.append(test_label,digits[4]);
+        
     for i in range(0,len(mat['test5'])):
-       
-        test_label=np.append(test_label,5);
-       
+        
+        test_label=np.append(test_label,digits[5]);
+        
     for i in range(0,len(mat['test6'])):
-       
-        test_label=np.append(test_label,6);
-       
+        
+        test_label=np.append(test_label,digits[6]);
+        
     for i in range(0,len(mat['test7'])):
-       
-        test_label=np.append(test_label,7);
-       
+        
+        test_label=np.append(test_label,digits[7]);
+        
     for i in range(0,len(mat['test8'])):
-       
-        test_label=np.append(test_label,8);
-       
+        
+        test_label=np.append(test_label,digits[8]);
+        
     for i in range(0,len(mat['test9'])):
-       
-        test_label=np.append(test_label,9);
-   
-    print "The testing data true labels are:"
+        
+        test_label=np.append(test_label,digits[9]);
+    
+    print "\nThe testing data true labels are:"
     print test_label
-    print "The size of testing data true labels is:"
-    print len(test_label)"""
+    print "\nThe size of testing data true labels is:"
+    print len(test_label)
    
+    """
+    rng = np.random.RandomState(42)
+    indices = np.arange(60000)
+    rng.shuffle(indices)
+    new_shuffled_data = train_data[indices]
+    new_shuffled_label = train_label[indices]
+    
+    print "\n\nNew shuffled data is:"
+    print len(new_shuffled_data)
+    print "\nNew shuffled labels are:"
+    print len(new_shuffled_label)
+    a = new_shuffled_data[:50000]
+    b = new_shuffled_data[:10000]
+    print "\n1st Parted data:"
+    print len(a)
+    print "\n2nd parted data:"
+    print len(b)
+
+    c = new_shuffled_label[:50000]
+    d = new_shuffled_label[:10000]
+    print "\n1st Parted label:"
+    print len(c)
+    print "\n2nd parted label:"
+    print len(d)
+    """
+           
     return train_data, train_label, validation_data, validation_label, test_data, test_label
     
-    
-    
+        
 
 def nnObjFunction(params, *args):
     """% nnObjFunction computes the value of objective function (negative log 
@@ -238,24 +276,11 @@ def nnObjFunction(params, *args):
     obj_val = 0  
     
     #Your code here
-    
-    #to compute the net input at each hidden node and take its sigmoid
-    net_input_for_hidden_node = np.array([])
-    
-    for h in range(0,n_hidden):
-        train_ex = 0    #the training example
-        for i in range(0,n_input):
-            net_ip += w1[i,h]*training_data[train_ex,i]
-            train_ex = train_ex + 1
-            net_input_for_hidden_node.vstack(net_input_for_hidden_nodes,net_ip)
-    
-    #to compute the net input at each output node and take its sigmoid
-    
-    #to compute obj_val which is error at output node
-    
-    
-    #to compute obj_grad vector which is the __?
-     
+    #
+    #
+    #
+    #
+    #
     
     
     
@@ -295,11 +320,21 @@ def nnPredict(w1,w2,data):
 
 
 """**************Neural Network Script Starts here********************************"""
-
 import os
 os.system('cls')
 
 train_data, train_label, validation_data,validation_label, test_data, test_label = preprocess();
+"""
+print "\n\nAFTER RETURN:"
+print "Length of training data:"
+print len(train_data)
+print "Length of training labels:"
+print len(train_label)
+
+print "Length of testing data:"
+print len(test_data)
+print "Length of testing labels:"
+print len(test_label)
 
 
 #  Train Neural Network
@@ -362,3 +397,4 @@ predicted_label = nnPredict(w1,w2,test_data)
 #find the accuracy on Validation Dataset
 
 print('\n Test set Accuracy:' + + str(100*np.mean((predicted_label == test_label).astype(float))) + '%')
+"""
