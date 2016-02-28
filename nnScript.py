@@ -31,7 +31,6 @@ def sigmoid(z):
     return  1 / (1 + math.exp(-z))
     
     
-
 def preprocess():
     """ Input:
      Although this function doesn't have any input, you are required to load
@@ -63,7 +62,6 @@ def preprocess():
     
     #Pick a reasonable size for validation data
     
-    
     #Your code here
     
     train_data = np.array([])
@@ -72,117 +70,148 @@ def preprocess():
     validation_label = np.array([])
     test_data = np.array([])
     test_label = np.array([])
-  
+
+    #To stack the training and validation data for all digits into single array:
+    all_data = np.array([])
+    all_label = np.array([])
     
-    train_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
-    print "\nThe stacked training data is:"
-    print train_data
-    print "\nThe size of stacked training data is:"
-    print len(train_data)
-   
-    digits = ["1000000000","0100000000","0010000000","0001000000","0000100000","0000010000","0000001000","0000000100","0000000010","0000000001"]
-                        
+    #Stacking the data for all the digits into one matrix 'all_data'
+    all_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
+    print "\nStacked all data is:"
+    print all_data
+    print "\nThe size of stacked all data is:"
+    print len(all_data)
+    
+#     An array of labels for all the digits 
+#     digits = ["1000000000","0100000000","0010000000","0001000000","0000100000","0000010000","0000001000","0000000100","0000000010","0000000001"]
+                         
     for i in range(0,len(mat['train0'])):
-        
-        train_label=np.append(train_label,digits[0]); 
-        
+            
+        all_label=np.append(all_label,0); 
+         
     for i in range(0,len(mat['train1'])):
-        
-        train_label=np.append(train_label,digits[1]);
-        
+         
+        all_label=np.append(all_label,1);
+         
     for i in range(0,len(mat['train2'])):
         
-        train_label=np.append(train_label,digits[2]);
+        all_label=np.append(all_label,2);
         
     for i in range(0,len(mat['train3'])):
         
-        train_label=np.append(train_label,digits[3]);
+        all_label=np.append(all_label,3);
         
     for i in range(0,len(mat['train4'])):
         
-        train_label=np.append(train_label,digits[4]);
+        all_label=np.append(all_label,4);
         
     for i in range(0,len(mat['train5'])):
         
-        train_label=np.append(train_label,digits[5]);
+        all_label=np.append(all_label,5);
         
     for i in range(0,len(mat['train6'])):
         
-        train_label=np.append(train_label,digits[6]);
+        all_label=np.append(all_label,6);
         
     for i in range(0,len(mat['train7'])):
         
-        train_label=np.append(train_label,digits[7]);
+        all_label=np.append(all_label,7);
         
     for i in range(0,len(mat['train8'])):
         
-        train_label=np.append(train_label,digits[8]);
+        all_label=np.append(all_label,8);
         
     for i in range(0,len(mat['train9'])):
         
-        train_label=np.append(train_label,digits[9]);
+        all_label=np.append(all_label,9);
     
-    #train_label.resize(60000,10)
     
-    print "\nThe training data true labels are:"
-    print train_label
-    print "\nThe size of training data true labels is:"
-    print len(train_label)
+    print "\nAll data true labels are:"
+    print all_label
+    print "\nThe size of all data true labels is:"
+    print len(all_label)
     
     test_data = np.vstack((mat['test0'],mat['test1'],mat['test2'],mat['test3'],mat['test4'],mat['test5'],mat['test6'],mat['test7'],mat['test8'],mat['test9']))
     print "\nThe stacked test data is:"
     print test_data
-    print "\nThe size of stacked training data is:"
+    print "\nThe size of stacked test data is:"
     print len(test_data)
-    
-    for i in range(0,len(mat['test0'])):
-        
-        test_label=np.append(test_label,digits[0]); 
-        
-    for i in range(0,len(mat['test1'])):
-        
-        test_label=np.append(test_label,digits[1]);
-        
-    for i in range(0,len(mat['test2'])):
-        
-        test_label=np.append(test_label,digits[2]);
-        
-    for i in range(0,len(mat['test3'])):
-        
-        test_label=np.append(test_label,digits[3]);
-        
-    for i in range(0,len(mat['test4'])):
-        
-        test_label=np.append(test_label,digits[4]);
-        
-    for i in range(0,len(mat['test5'])):
-        
-        test_label=np.append(test_label,digits[5]);
-        
-    for i in range(0,len(mat['test6'])):
-        
-        test_label=np.append(test_label,digits[6]);
-        
-    for i in range(0,len(mat['test7'])):
-        
-        test_label=np.append(test_label,digits[7]);
-        
-    for i in range(0,len(mat['test8'])):
-        
-        test_label=np.append(test_label,digits[8]);
-        
-    for i in range(0,len(mat['test9'])):
-        
-        test_label=np.append(test_label,digits[9]);
-    
+     
+    for i in range(len(mat['test0'])):
+         
+        test_label=np.append(test_label,0); 
+         
+    for i in range(len(mat['test1'])):
+         
+        test_label=np.append(test_label,1);
+         
+    for i in range(len(mat['test2'])):
+         
+        test_label=np.append(test_label,2);
+         
+    for i in range(len(mat['test3'])):
+         
+        test_label=np.append(test_label,3);
+         
+    for i in range(len(mat['test4'])):
+         
+        test_label=np.append(test_label,4);
+         
+    for i in range(len(mat['test5'])):
+         
+        test_label=np.append(test_label,5);
+         
+    for i in range(len(mat['test6'])):
+         
+        test_label=np.append(test_label,6);
+         
+    for i in range(len(mat['test7'])):
+         
+        test_label=np.append(test_label,7);
+         
+    for i in range(len(mat['test8'])):
+         
+        test_label=np.append(test_label,8);
+         
+    for i in range(len(mat['test9'])):
+         
+        test_label=np.append(test_label,9);
+     
     print "\nThe testing data true labels are:"
     print test_label
     print "\nThe size of testing data true labels is:"
     print len(test_label)
-             
-    return train_data, train_label, validation_data, validation_label, test_data, test_label
     
-        
+    
+    randomObject = np.random.RandomState()
+    indices = np.arange(60000)
+    randomObject.shuffle(indices)
+    shuffled_data = all_data[indices]
+    shuffled_label = all_label[indices]
+    
+    print "\n\nShuffled data is:"
+    print len(shuffled_data)
+    print "\nShuffled labels are:"
+    print len(shuffled_label)
+   
+    validation_data = shuffled_data[:10000]
+    train_data = shuffled_data[10000:]
+    print "\nValidation data is:"
+    print len(validation_data)
+    print "\nTraining data is:"
+    print len(train_data)
+
+    validation_label = shuffled_label[:10000]
+    train_label = shuffled_label[10000:]
+    print "\nValidation labels are:"
+    print len(validation_label)
+    print "\nTraining labels are:"
+    print len(train_label)
+    
+           
+	return train_data, train_label, validation_data, validation_label, test_data, test_label
+    
+         
 
 def nnObjFunction(params, *args):
     """% nnObjFunction computes the value of objective function (negative log 
