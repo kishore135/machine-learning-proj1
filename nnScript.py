@@ -30,7 +30,7 @@ def sigmoid(z):
     
     return  1 / (1 + math.exp(-z))
     
-    
+
 def preprocess():
     """ Input:
      Although this function doesn't have any input, you are required to load
@@ -58,9 +58,10 @@ def preprocess():
      - normalize the data to [0, 1]
      - feature selection"""
     
-    mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary
+
+	mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary    
     
-    #Pick a reasonable size for validation data
+	#Pick a reasonable size for validation data
     
     #Your code here
     
@@ -71,22 +72,23 @@ def preprocess():
     test_data = np.array([])
     test_label = np.array([])
 
-    #To stack the training and validation data for all digits into single array:
+    #Arrays to store the entire training and validation data for all digits:
     all_data = np.array([])
     all_label = np.array([])
     
-    #Stacking the data for all the digits into one matrix 'all_data'
+    #Stacking the entire train data for all the digits into one matrix 'all_data'
     all_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
     print "\nStacked all data is:"
     print all_data
     print "\nThe size of stacked all data is:"
     print len(all_data)
     
-#     An array of labels for all the digits 
-#     digits = ["1000000000","0100000000","0010000000","0001000000","0000100000","0000010000","0000001000","0000000100","0000000010","0000000001"]
-                         
+    all_data_size = len(all_data)
+    validation_data_size = all_data_size/6  #Validation data size taken as 1/6th of the total training data size
+    
+	#Append the true labels of the entire train data to a label vector for all the digits:                        
     for i in range(0,len(mat['train0'])):
-            
+             
         all_label=np.append(all_label,0); 
          
     for i in range(0,len(mat['train1'])):
@@ -131,12 +133,14 @@ def preprocess():
     print "\nThe size of all data true labels is:"
     print len(all_label)
     
+	#Stack the test data into a single matrix test_data for all the digits:
     test_data = np.vstack((mat['test0'],mat['test1'],mat['test2'],mat['test3'],mat['test4'],mat['test5'],mat['test6'],mat['test7'],mat['test8'],mat['test9']))
     print "\nThe stacked test data is:"
     print test_data
     print "\nThe size of stacked test data is:"
     print len(test_data)
-     
+    
+	#Append	the true labels of test data to the test_label vector for all the digits:
     for i in range(len(mat['test0'])):
          
         test_label=np.append(test_label,0); 
@@ -182,10 +186,12 @@ def preprocess():
     print "\nThe size of testing data true labels is:"
     print len(test_label)
     
-    
+    #Randomize function for randomly shuffling the training data and labels into the same sequence:
     randomObject = np.random.RandomState()
-    indices = np.arange(60000)
+    indices = np.arange(all_data_size)
     randomObject.shuffle(indices)
+	
+	#Shuffling the arrays all_data and all_label
     shuffled_data = all_data[indices]
     shuffled_label = all_label[indices]
     
@@ -194,23 +200,24 @@ def preprocess():
     print "\nShuffled labels are:"
     print len(shuffled_label)
    
-    validation_data = shuffled_data[:10000]
-    train_data = shuffled_data[10000:]
+    #Splitting the entire training data 'all_data' into 'validation_data' and 'training_data' according to 'validation_data_size':
+    validation_data = shuffled_data[:validation_data_size]
+    train_data = shuffled_data[validation_data_size:]
     print "\nValidation data is:"
     print len(validation_data)
     print "\nTraining data is:"
     print len(train_data)
 
-    validation_label = shuffled_label[:10000]
-    train_label = shuffled_label[10000:]
+	#Splitting all the training labels 'all_label' into 'validation_label' and 'training_label' according to 'validation_data_size':
+    validation_label = shuffled_label[:validation_data_size]
+    train_label = shuffled_label[validation_data_size:]
     print "\nValidation labels are:"
     print len(validation_label)
     print "\nTraining labels are:"
     print len(train_label)
     
-           
+    #returning all the data matrices and label vectors       
     return train_data, train_label, validation_data, validation_label, test_data, test_label
-    
          
 
 def nnObjFunction(params, *args):
