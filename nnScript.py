@@ -58,7 +58,7 @@ def preprocess():
      - normalize the data to [0, 1]
      - feature selection"""
     
-    mat = loadmat('D:\mnist_all.mat') #loads the MAT object as a Dictionary
+    mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary
     
     #Pick a reasonable size for validation data
     
@@ -209,7 +209,7 @@ def preprocess():
     print len(train_label)
     
            
-	return train_data, train_label, validation_data, validation_label, test_data, test_label
+    return train_data, train_label, validation_data, validation_label, test_data, test_label
     
          
 
@@ -279,9 +279,13 @@ def nnObjFunction(params, *args):
     #print "Printing w2T..."
     #print w2T
     
+    #total error for entire training data
+    final_error = 0
                 
     #for each training example    
     for te in range(0,training_data.shape[0]-1):
+        #total error for training example
+        error_for_training_example = 0 
         #input vector will be row(te) in the training_data
         inputs = np.array([])
         inputs = training_data[te,:]
@@ -321,6 +325,7 @@ def nnObjFunction(params, *args):
             sig_o = sigmoid(net_input_at_output_node)
             np.append(sigmoid_at_output_nodes,sig_o)
         
+        """
         #all the values in 'sigmoid_at_output_nodes' are in decimals
         #before calculating the error at output, we need to convert it to an output comparable to the true labels
         #that is, in the form of 0's and 1's
@@ -332,17 +337,46 @@ def nnObjFunction(params, *args):
                 observed_label += 1
             else:
                 observed_label += 0
+        """
         
         #compute the error at each output node
         #compute the total error at output by summing the individual errors        
         total_error = 0        
         for o in range(0,n_class-1):
             #error at each output node is the square of difference between the observed and expected output
-            error = math.pow((training_label[te] - sigmoid_at_output_nodes[o]),2)
+            if( training_label[te] == 0 or 
+                training_label[te] == 1 or
+                training_label[te] == 2 or
+                training_label[te] == 3 or
+                training_label[te] == 4 or
+                training_label[te] == 5 or
+                training_label[te] == 6 or
+                training_label[te] == 7 or
+                training_label[te] == 8 or
+                training_label[te] == 9):
+                error = math.pow((1.0 - sigmoid_at_output_nodes[o]),2)
+            else:
+                error = math.pow((0.0 - sigmoid_at_output_nodes[o]),2)
+            
+            #total error at this output node
             total_error += error 
-        obj_val = total_error / 2
         
-        #compute the gradient of the error
+        #total error for this training example
+        error_for_training_example = total_error / 2
+    
+    #total error for the entire training data
+    final_error += error_for_training_example
+    
+    #error value for all training data together
+    #=sum of errors for all training examples / number of training examples 
+    obj_val = final_error / training_data.shape[0]  #to be returned
+    
+        
+    #compute the derivation of error functions and gradient of the error
+    #first, derivation of error function wrt weights from hidden to output nodes
+        
+    #second, derivation of error function wrt weights from input to hidden nodes
+    
 
         
     
@@ -387,17 +421,6 @@ import os
 os.system('cls')
 
 train_data, train_label, validation_data,validation_label, test_data, test_label = preprocess();
-"""
-print "\n\nAFTER RETURN:"
-print "Length of training data:"
-print len(train_data)
-print "Length of training labels:"
-print len(train_label)
-
-print "Length of testing data:"
-print len(test_data)
-print "Length of testing labels:"
-print len(test_label)
 
 
 #  Train Neural Network
@@ -406,10 +429,10 @@ print len(test_label)
 n_input = train_data.shape[1]; 
 
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 50;
-				   
+n_hidden = 4;
+                   
 # set the number of nodes in output unit
-n_class = 10;				   
+n_class = 10;                   
 
 # initialize the weights into some random matrices
 initial_w1 = initializeWeights(n_input, n_hidden);
@@ -426,7 +449,7 @@ args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 50}    # Preferred value.
+opts = {'maxiter' : 4}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
@@ -460,4 +483,3 @@ predicted_label = nnPredict(w1,w2,test_data)
 #find the accuracy on Validation Dataset
 
 print('\n Test set Accuracy:' + + str(100*np.mean((predicted_label == test_label).astype(float))) + '%')
-"""
