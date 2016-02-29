@@ -30,7 +30,6 @@ def sigmoid(z):
     
     return  1 / (1 + math.exp(-z))
     
-    
 
 def preprocess():
     """ Input:
@@ -60,8 +59,8 @@ def preprocess():
      - feature selection"""
     
 
-    mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary    
-
+    mat = loadmat('D:\mnist_all.mat') #loads the MAT object as a Dictionary    
+    
     #Pick a reasonable size for validation data
     
     #Your code here
@@ -73,75 +72,71 @@ def preprocess():
     test_data = np.array([])
     test_label = np.array([])
 
-    #Arrays to store the entire training and validation data for all digits:
-    all_data = np.array([])
-    all_label = np.array([])
+    #Arrays to store the entire training data (including validation data) for all digits:
+    all_training_data = np.array([])
+    all_training_label = np.array([])
     
     #Stacking the entire train data for all the digits into one matrix 'all_data'
-    all_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
-    print "\nStacked all data is:"
-    print all_data
-    print "\nThe size of stacked all data is:"
-    print len(all_data)
+    all_training_data = np.vstack((mat['train0'],mat['train1'],mat['train2'],mat['train3'],mat['train4'],mat['train5'],mat['train6'],mat['train7'],mat['train8'],mat['train9']))
+    print "\nAll training data (stacked) is:"
+    print all_training_data.shape
     
-    all_data_size = len(all_data)
-    validation_data_size = all_data_size/6  #Validation data size taken as 1/6th of the total training data size
+    #Validation data taken as 1/6th of the total training data:
+    all_training_data_size = len(all_training_data)
+    validation_data_size = all_training_data_size/6 
+    train_data_size = all_training_data_size - validation_data_size 
     
     #Append the true labels of the entire train data to a label vector for all the digits:                        
     for i in range(0,len(mat['train0'])):
              
-        all_label=np.append(all_label,0); 
+        all_training_label=np.append(all_training_label,0); 
          
     for i in range(0,len(mat['train1'])):
          
-        all_label=np.append(all_label,1);
+        all_training_label=np.append(all_training_label,1);
          
     for i in range(0,len(mat['train2'])):
         
-        all_label=np.append(all_label,2);
+        all_training_label=np.append(all_training_label,2);
         
     for i in range(0,len(mat['train3'])):
         
-        all_label=np.append(all_label,3);
+        all_training_label=np.append(all_training_label,3);
         
     for i in range(0,len(mat['train4'])):
         
-        all_label=np.append(all_label,4);
+        all_training_label=np.append(all_training_label,4);
         
     for i in range(0,len(mat['train5'])):
         
-        all_label=np.append(all_label,5);
+        all_training_label=np.append(all_training_label,5);
         
     for i in range(0,len(mat['train6'])):
         
-        all_label=np.append(all_label,6);
+        all_training_label=np.append(all_training_label,6);
         
     for i in range(0,len(mat['train7'])):
         
-        all_label=np.append(all_label,7);
+        all_training_label=np.append(all_training_label,7);
         
     for i in range(0,len(mat['train8'])):
         
-        all_label=np.append(all_label,8);
+        all_training_label=np.append(all_training_label,8);
         
     for i in range(0,len(mat['train9'])):
         
-        all_label=np.append(all_label,9);
+        all_training_label=np.append(all_training_label,9);
     
     
-    print "\nAll data true labels are:"
-    print all_label
-    print "\nThe size of all data true labels is:"
-    print len(all_label)
+    print "\nAll traininig data true labels are:"
+    print all_training_label.shape
     
     #Stack the test data into a single matrix test_data for all the digits:
     test_data = np.vstack((mat['test0'],mat['test1'],mat['test2'],mat['test3'],mat['test4'],mat['test5'],mat['test6'],mat['test7'],mat['test8'],mat['test9']))
     print "\nThe stacked test data is:"
-    print test_data
-    print "\nThe size of stacked test data is:"
-    print len(test_data)
+    print test_data.shape
     
-    #Append    the true labels of test data to the test_label vector for all the digits:
+    #Append the true labels of test data to the test_label vector for all the digits:
     for i in range(len(mat['test0'])):
          
         test_label=np.append(test_label,0); 
@@ -183,43 +178,78 @@ def preprocess():
         test_label=np.append(test_label,9);
      
     print "\nThe testing data true labels are:"
-    print test_label
-    print "\nThe size of testing data true labels is:"
-    print len(test_label)
+    print test_label.shape
     
     #Randomize function for randomly shuffling the training data and labels into the same sequence:
     randomObject = np.random.RandomState()
-    indices = np.arange(all_data_size)
+    indices = np.arange(all_training_data_size)
     randomObject.shuffle(indices)
     
     #Shuffling the arrays all_data and all_label
-    shuffled_data = all_data[indices]
-    shuffled_label = all_label[indices]
+    shuffled_training_data = all_training_data[indices]
+    shuffled_training_label = all_training_label[indices]
     
-    print "\n\nShuffled data is:"
-    print len(shuffled_data)
-    print "\nShuffled labels are:"
-    print len(shuffled_label)
+    print "\nShuffled training data is:"
+    print shuffled_training_data.shape
+
+    print "\nShuffled training labels are:"
+    print shuffled_training_label.shape
    
     #Splitting the entire training data 'all_data' into 'validation_data' and 'training_data' according to 'validation_data_size':
-    validation_data = shuffled_data[:validation_data_size]
-    train_data = shuffled_data[validation_data_size:]
-    print "\nValidation data is:"
-    print len(validation_data)
-    print "\nTraining data is:"
-    print len(train_data)
+    validation_data = shuffled_training_data[:validation_data_size]
+    train_data = shuffled_training_data[validation_data_size:]
+    print "\nSplit Validation data is:"
+    print validation_data.shape
+    
+    print "\nSplit Training data is:"
+    print train_data.shape
 
     #Splitting all the training labels 'all_label' into 'validation_label' and 'training_label' according to 'validation_data_size':
-    validation_label = shuffled_label[:validation_data_size]
-    train_label = shuffled_label[validation_data_size:]
-    print "\nValidation labels are:"
-    print len(validation_label)
-    print "\nTraining labels are:"
-    print len(train_label)
+    validation_label = shuffled_training_label[:validation_data_size]
+    train_label = shuffled_training_label[validation_data_size:]
+    print "\nSplit Validation labels are:"
+    print validation_label.shape
+    
+    print "\nSplit Training labels are:"
+    print train_label.shape
+    
+    #Feature Selection and normalizarion:
+    
+    #Stack the training, validation and test data to find out all columns which have only 0's:
+    featured_data = np.array(np.vstack((train_data,validation_data,test_data)))
+    print "\nCombined Featured data is:"
+    print featured_data.shape
+    
+    #Normalize all the data between 0 and 255
+    featured_data = featured_data/255.0
+    
+    #Search the columns with all 0's:
+    col_zero = np.where(~featured_data.any(axis=0))[0]
+#     print "\nColumns with all 0's are:"
+#     print len(col_zero)
+#     print col_zero
+    
+    #Delete the columns found in previous step
+    for i in range((len(col_zero)-1),-1,-1):
+        featured_data = scipy.delete(featured_data,col_zero[i],1)
+    
+    #Split the data back into training, validation and testing data:
+    train_data = featured_data[:train_data_size]
+    validation_data = featured_data[train_data_size:(train_data_size+validation_data_size)]
+    test_data = featured_data[(train_data_size+validation_data_size):]
+    
+    print "\nAfter deletion, final data:"
+    print "Combined data:"
+    print featured_data.shape
+    print "Train:"
+    print train_data.shape
+    print "Validationn:"
+    print validation_data.shape
+    print "Test:"
+    print test_data.shape
     
     #returning all the data matrices and label vectors       
     return train_data, train_label, validation_data, validation_label, test_data, test_label
-    
     
 
 def nnObjFunction(params, *args):
