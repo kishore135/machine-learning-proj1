@@ -1,10 +1,14 @@
 import numpy as np
 from scipy.optimize import minimize
 from scipy.io import loadmat
+from scipy.stats import logistic
+from scipy.special import expit
 from math import sqrt
 import math
+import scipy
+from stringold import digits
 
-
+    
 def initializeWeights(n_in,n_out):
     """
     # initializeWeights return the random weights for Neural Network given the
@@ -17,6 +21,8 @@ def initializeWeights(n_in,n_out):
     # Output: 
     # W: matrix of random initial weights with size (n_out x (n_in + 1))"""
     
+    print "**********Inside initializeWeights**********"
+    
     epsilon = sqrt(6) / sqrt(n_in + n_out + 1);
     W = (np.random.rand(n_out, n_in + 1)*2* epsilon) - epsilon;
     return W
@@ -28,7 +34,10 @@ def sigmoid(z):
     """# Notice that z can be a scalar, a vector or a matrix
     # return the sigmoid of input z"""
     
-    return  1 / (1 + math.exp(-z))
+    print "**********Inside sigmoid**********"
+    
+    return  expit(z)
+    
     
 
 def preprocess():
@@ -251,6 +260,7 @@ def preprocess():
     #returning all the data matrices and label vectors       
     return train_data, train_label, validation_data, validation_label, test_data, test_label
     
+    
 
 def nnObjFunction(params, *args):
     """% nnObjFunction computes the value of objective function (negative log 
@@ -298,162 +308,111 @@ def nnObjFunction(params, *args):
     
     #Your code here
     
-    #-----------------the algo corresponding to the code below-----------------
-    #for each training example
-        #for each hidden node
-            #compute the net input at each hidden node
-            #compute the sigmoid of the computed input and store it
-        #for each output node
-            #compute the net input at each output node
-            #compute the sigmoid of the computed input and store it
-        #calculate the error at output nodes
-        #calculate the gradiant of the error
-    #--------------------------------------------------------------------------
+    print "**********Inside nnObjFunction**********"
     
-    #to perform the calculations in the above algo, we need transpose of the weight matrices
-    #therefore, original w1(50*785) should be converted to w1T(785*50)
-    #similarly, original w2(10*50) should be converted to w2T(50*10)
-    #w1T = np.transpose(w1)
-    #w2T = np.transpose(w2)
-    #print "Printing w2T..."
-    #print w2T
+    #-------------------Feed Forward Phase-------------------------------------------
     
-    #total error and gradient for entire training data
-    final_error = 0
-    final_error_gradient = 0
-                
-    #for each training example    
-    for te in range(0,training_data.shape[0]):
-        #few declarations
-        #total error for training example
-        error_for_training_example = 0        
-        #error gradients for training example wrt the 2 weight vectors
-        intermediate_grad_w1 = np.array([])
-        intermediate_grad_w2 = np.array([])
-        
-        #input vector will be row(te) in the training_data
-        inputs = np.array([])
-        inputs = training_data[te,:]
-        #print "Printing inputs 1"
-        #print inputs
-        
-        #np array to store the sigmoids of net inputs at the hidden nodes
-        sigmoid_at_hidden_nodes = np.array([])
-        
-        #for each hidden node
-        for h in range(0,n_hidden):
-            #compute the net input at each hidden node
-            #calculate product of input and weight from each input node, sum them all together
-            net_input_at_hidden_node = 0
-            for n in range(0,inputs.size+1):                
-                #if input node is bias node
-                if n == inputs.size:
-                    net_input_at_hidden_node += (1 * w1[h,n])                    
-                else:
-                    net_input_at_hidden_node += (inputs[n] * w1[h,n])
-            sig_h = sigmoid(net_input_at_hidden_node)            
-            sigmoid_at_hidden_nodes = np.append(sigmoid_at_hidden_nodes,sig_h)
-            
-            
-        #np array to store the sigmoids of net inputs at the output nodes
-        sigmoid_at_output_nodes = np.array([])
-        
-        #for each output node
-        for o in range(0,n_class):
-            #compute the net input at each output node
-            #calculate the product of input and weight from each hidden node, sum them all together
-            net_input_at_output_node = 0
-            for s in range(0,sigmoid_at_hidden_nodes.size+1):
-                #if hidden node is a bias node
-                if s == sigmoid_at_hidden_nodes.size:
-                    net_input_at_output_node += (1 * w2[o,s])
-                else:
-                    net_input_at_output_node += (sigmoid_at_hidden_nodes[s] * w2[o,s])
-            sig_o = sigmoid(net_input_at_output_node)
-            sigmoid_at_output_nodes = np.append(sigmoid_at_output_nodes,sig_o)        
-            
-        
-        """
-        #printing sigmoid_at_output_node
-        print "TE # : "
-        print te
-        for x in range(0,sigmoid_at_output_nodes.size):            
-            print x
-            print sigmoid_at_output_nodes[x]
-        """
-        
-        #compute the error at each output node
-        #compute the total error at output by summing the individual errors        
-        total_error = 0        
-        for o in range(0,n_class):
-            #error at each output node is the square of difference between the observed and expected output
-            if( training_label[te] == 0 or 
-                training_label[te] == 1 or
-                training_label[te] == 2 or
-                training_label[te] == 3 or
-                training_label[te] == 4 or
-                training_label[te] == 5 or
-                training_label[te] == 6 or
-                training_label[te] == 7 or
-                training_label[te] == 8 or
-                training_label[te] == 9):
-                error = math.pow((1 - sigmoid_at_output_nodes[o]),2)
-            else:
-                error = math.pow((0 - sigmoid_at_output_nodes[o]),2)
-            total_error += error 
-        error_for_training_example = total_error / 2
-        
-        #calculating the gradient of error for every training example
-        #formula is -(1-)
-        
-    final_error += error_for_training_example
+    #for hidden nodes    
+    #given training data does not consider the bias node, therefore adding it:
+    input_bias_node = np.zeros(len(training_data))
+    #inputs from bias nodes is 1
+    input_bias_node.fill(1)
+    training_data = np.column_stack([training_data,input_bias_node])
+    #taking transpose of w1 for dot product
+    w1T = np.transpose(w1)
+    #taking dot product of inputs with weights
+    aj = np.dot(training_data,w1T)
+    #taking sigmoids of aj
+    zj = sigmoid(aj)
     
-    #error value for all training data together
-    #=sum of errors for all training examples / number of training examples 
-    intermediate_obj_val = final_error / training_data.shape[0]    
-    #obj_val ie equation 15 over intermediate_obj_val
-    #obj_val = intermediate_obj_val + regularization term
-    regularization_term = 0
-    #calculating regularization of w1
-    r1 = 0
-    for i in range(0,n_hidden):
-        r2 = 0
-        for j in range(0,n_input+1):
-            r2 += math.pow(w1[j,i],2)
-        r1 += r2
+    #for output nodes
+    hidden_bias_node = np.zeros(len(zj))
+    hidden_bias_node.fill(1)
+    zj = np.column_stack([zj,hidden_bias_node])
+    #taking transpose of w2 for dot product
+    w2T = np.transpose(w2)
+    bl = np.dot(zj,w2T)
+    ol = sigmoid(bl)
+           
+    #-------------------Back Propagation Phase---------------------------------------
     
-    #calculating regularization of w1
-    r3= 0
-    for l in range(0,n_class):
-        r4 = 0
-        for j in range(0,n_hidden+1):
-            r4 += math.pow(w2[l,j],2)
-        r3 += r4
+    #-------------------Gradiance Phase----------------------------------------------
     
-    total_r = (lambdaval / (2 * training_data.shape[0])) * (r1 + r3)
-    obj_val = intermediate_obj_val + total_r
+    #to calculate the gradiance, we need the true labels in 1 of k notation
+    #converting...
+#     yl = np.zeros((len(training_data),10))
+#     for i in range(0,len(training_data)):
+#         yl[i][training_label[i]] = 1
     
-    #computing error gradiance
-    #computing the gradient wrt w2 in the output layer
-    grad_output_nodes = np.array([])
-    for l in range(0,n_class):
-        delta_l = (training_label[te] - sigmoid_at_output_nodes[l]) * (1 - sigmoid_at_output_nodes[l]) * sigmoid_at_output_nodes[l]
-        gw2 = delta_l * sigmoid_at_hidden_nodes[]
+    yl = np.array([])
+    for i in range(0,len(training_data)):
+        digits = [0,0,0,0,0,0,0,0,0,0]
+        digits[int(training_label[i])]=1
+        yl=np.append(yl,digits)
+    yl.resize(len(training_label),n_class)
+    #print "yl size is:"
+    #print yl.shape
+    
+    #now calculating gradiance wrt w2
+    print "yl and ol shapes"
+    print yl.shape
+    print ol.shape
+    
+    delta_l = -1 * (yl - ol) * (1 - ol) * ol
+    print delta_l.shape
+    delta_l_T = np.transpose(delta_l)
+    grad_w2 = np.dot(delta_l_T,zj)  
+    print grad_w2.shape
+    
+    #now calculating gradiance wrt w1
+    gw1_term1 = -1 * (zj - 1) * zj
+    gw1_term2 = np.dot(delta_l,w2)
+    gw1_term3 = gw1_term1 * gw1_term2
+    gw1_term3_T = np.transpose(gw1_term3)
+    
+    grad_w1 = np.dot(gw1_term3_T,training_data)
+    grad_w1 = grad_w1[0:n_hidden,:]
+    print grad_w1.shape
+    
+    #-------------------Error Function Phase-----------------------------------------
+    #calculating error as squared loss error function
+    error_term_n = 0
+    for n in range(0,len(training_data)):
+        error_term_k = 0
+        for k in range(0,n_class):
+            error_term_k = (math.pow((yl[n][k] - ol[n][k]),2))             
+        error_term_n += (error_term_k / 2)
+    error_term = (error_term_n / len(training_data))
+    print "error term"
+    print error_term
+    
+    #-------------------Regularization Phase-----------------------------------------
+    
+    #Regularization of gradiance    
+    #Regularization of grad_w1
+    grad_w1 = (grad_w1 + (lambdaval * w1)) / len(training_data)
+    
+    #Regularization of grad_w2
+    grad_w2 = (grad_w2 + (lambdaval * w2)) / len(training_data)
+    
+    #final gradiance
+    obj_grad = np.array([])
+    obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
+    
+    #Regularization of error value
+    reg_term1 = np.sum(w1 * w1)
+    reg_term2 = np.sum(w2 * w2)
+    
+    reg_term3 = (lambdaval/(2*len(training_data)))*(reg_term1 + reg_term2)
+    obj_val = error_term + reg_term3 
+    print "obj_val : "
+    print obj_val
+    
         
-    #compute the derivation of error functions and gradient of the error
-    #first, derivation of error function wrt weights from hidden to output nodes
-    
-    
-    #second, derivation of error function wrt weights from input to hidden nodes
-    
-
-        
-    
     #Make sure you reshape the gradient matrices to a 1D array. for instance if your gradient matrices are grad_w1 and grad_w2
     #you would use code similar to the one below to create a flat array
     #obj_grad = np.concatenate((grad_w1.flatten(), grad_w2.flatten()),0)
-    
-    obj_grad = np.array([])
+       
     
     return (obj_val,obj_grad)
 
@@ -480,6 +439,34 @@ def nnPredict(w1,w2,data):
     labels = np.array([])
     #Your code here
     
+    print "**********Inside nnPredict**********"
+    
+    #for hidden nodes    
+    #given training data does not consider the bias node, therefore adding it:
+    input_bias_node = np.zeros(len(data))
+    #inputs from bias nodes is 1
+    input_bias_node.fill(1)
+    training_data = np.column_stack([data,input_bias_node])
+    #taking transpose of w1 for dot product
+    w1T = np.transpose(w1)
+    #taking dot product of inputs with weights
+    aj = np.dot(training_data,w1T)
+    #taking sigmoids of aj
+    zj = sigmoid(aj)
+    
+    #for output nodes
+    hidden_bias_node = np.zeros(len(zj))
+    hidden_bias_node.fill(1)
+    zj = np.column_stack([zj,hidden_bias_node])
+    #taking transpose of w2 for dot product
+    w2T = np.transpose(w2)
+    bl = np.dot(zj,w2T)
+    ol = sigmoid(bl)
+    
+    for i in range(ol.shape[0]):
+       max_index = np.argmax(ol[i])
+       labels = np.append(labels, max_index)
+    
     return labels
     
 
@@ -499,7 +486,7 @@ train_data, train_label, validation_data,validation_label, test_data, test_label
 n_input = train_data.shape[1]; 
 
 # set the number of nodes in hidden unit (not including bias unit)
-n_hidden = 4;
+n_hidden = 5;
                    
 # set the number of nodes in output unit
 n_class = 10;                   
@@ -512,14 +499,14 @@ initial_w2 = initializeWeights(n_hidden, n_class);
 initialWeights = np.concatenate((initial_w1.flatten(), initial_w2.flatten()),0)
 
 # set the regularization hyper-parameter
-lambdaval = 0;
+lambdaval = 0.1;
 
 
 args = (n_input, n_hidden, n_class, train_data, train_label, lambdaval)
 
 #Train Neural Network using fmin_cg or minimize from scipy,optimize module. Check documentation for a working example
 
-opts = {'maxiter' : 4}    # Preferred value.
+opts = {'maxiter' : 5}    # Preferred value.
 
 nn_params = minimize(nnObjFunction, initialWeights, jac=True, args=args,method='CG', options=opts)
 
@@ -552,4 +539,4 @@ predicted_label = nnPredict(w1,w2,test_data)
 
 #find the accuracy on Validation Dataset
 
-print('\n Test set Accuracy:' + + str(100*np.mean((predicted_label == test_label).astype(float))) + '%')
+print('\n Test set Accuracy:' + str(100*np.mean((predicted_label == test_label).astype(float))) + '%')
