@@ -30,6 +30,7 @@ def sigmoid(z):
     
     return  1 / (1 + math.exp(-z))
     
+    
 
 def preprocess():
     """ Input:
@@ -59,9 +60,9 @@ def preprocess():
      - feature selection"""
     
 
-	mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary    
-    
-	#Pick a reasonable size for validation data
+    mat = loadmat('D:\Work\Machine Learning\PA1\mnist_all.mat') #loads the MAT object as a Dictionary    
+
+    #Pick a reasonable size for validation data
     
     #Your code here
     
@@ -86,7 +87,7 @@ def preprocess():
     all_data_size = len(all_data)
     validation_data_size = all_data_size/6  #Validation data size taken as 1/6th of the total training data size
     
-	#Append the true labels of the entire train data to a label vector for all the digits:                        
+    #Append the true labels of the entire train data to a label vector for all the digits:                        
     for i in range(0,len(mat['train0'])):
              
         all_label=np.append(all_label,0); 
@@ -133,14 +134,14 @@ def preprocess():
     print "\nThe size of all data true labels is:"
     print len(all_label)
     
-	#Stack the test data into a single matrix test_data for all the digits:
+    #Stack the test data into a single matrix test_data for all the digits:
     test_data = np.vstack((mat['test0'],mat['test1'],mat['test2'],mat['test3'],mat['test4'],mat['test5'],mat['test6'],mat['test7'],mat['test8'],mat['test9']))
     print "\nThe stacked test data is:"
     print test_data
     print "\nThe size of stacked test data is:"
     print len(test_data)
     
-	#Append	the true labels of test data to the test_label vector for all the digits:
+    #Append    the true labels of test data to the test_label vector for all the digits:
     for i in range(len(mat['test0'])):
          
         test_label=np.append(test_label,0); 
@@ -190,8 +191,8 @@ def preprocess():
     randomObject = np.random.RandomState()
     indices = np.arange(all_data_size)
     randomObject.shuffle(indices)
-	
-	#Shuffling the arrays all_data and all_label
+    
+    #Shuffling the arrays all_data and all_label
     shuffled_data = all_data[indices]
     shuffled_label = all_label[indices]
     
@@ -208,7 +209,7 @@ def preprocess():
     print "\nTraining data is:"
     print len(train_data)
 
-	#Splitting all the training labels 'all_label' into 'validation_label' and 'training_label' according to 'validation_data_size':
+    #Splitting all the training labels 'all_label' into 'validation_label' and 'training_label' according to 'validation_data_size':
     validation_label = shuffled_label[:validation_data_size]
     train_label = shuffled_label[validation_data_size:]
     print "\nValidation labels are:"
@@ -218,7 +219,8 @@ def preprocess():
     
     #returning all the data matrices and label vectors       
     return train_data, train_label, validation_data, validation_label, test_data, test_label
-         
+    
+    
 
 def nnObjFunction(params, *args):
     """% nnObjFunction computes the value of objective function (negative log 
@@ -281,18 +283,24 @@ def nnObjFunction(params, *args):
     #to perform the calculations in the above algo, we need transpose of the weight matrices
     #therefore, original w1(50*785) should be converted to w1T(785*50)
     #similarly, original w2(10*50) should be converted to w2T(50*10)
-    w1T = np.transpose(w1)
-    w2T = np.transpose(w2)
+    #w1T = np.transpose(w1)
+    #w2T = np.transpose(w2)
     #print "Printing w2T..."
     #print w2T
     
-    #total error for entire training data
+    #total error and gradient for entire training data
     final_error = 0
+    final_error_gradient = 0
                 
     #for each training example    
-    for te in range(0,training_data.shape[0]-1):
+    for te in range(0,training_data.shape[0]):
+        #few declarations
         #total error for training example
-        error_for_training_example = 0 
+        error_for_training_example = 0        
+        #error gradients for training example wrt the 2 weight vectors
+        intermediate_grad_w1 = np.array([])
+        intermediate_grad_w2 = np.array([])
+        
         #input vector will be row(te) in the training_data
         inputs = np.array([])
         inputs = training_data[te,:]
@@ -303,53 +311,51 @@ def nnObjFunction(params, *args):
         sigmoid_at_hidden_nodes = np.array([])
         
         #for each hidden node
-        for h in range(0,n_hidden-1):
+        for h in range(0,n_hidden):
             #compute the net input at each hidden node
             #calculate product of input and weight from each input node, sum them all together
             net_input_at_hidden_node = 0
-            for n in range(0,inputs.size-1):
-                #p = inputs[n] * w1T[n,h]
-                #net_input_at_hidden_node += p
-                net_input_at_hidden_node += (inputs[n] * w1T[n,h])
-            sig_h = sigmoid(net_input_at_hidden_node)
-            #print "Printing sigmoid..."
-            #print sig
-            np.append(sigmoid_at_hidden_nodes,sig_h)
+            for n in range(0,inputs.size+1):                
+                #if input node is bias node
+                if n == inputs.size:
+                    net_input_at_hidden_node += (1 * w1[h,n])                    
+                else:
+                    net_input_at_hidden_node += (inputs[n] * w1[h,n])
+            sig_h = sigmoid(net_input_at_hidden_node)            
+            sigmoid_at_hidden_nodes = np.append(sigmoid_at_hidden_nodes,sig_h)
             
             
         #np array to store the sigmoids of net inputs at the output nodes
         sigmoid_at_output_nodes = np.array([])
         
         #for each output node
-        for o in range(0,n_class-1):
+        for o in range(0,n_class):
             #compute the net input at each output node
             #calculate the product of input and weight from each hidden node, sum them all together
             net_input_at_output_node = 0
-            for s in range(0,sigmoid_at_hidden_nodes.size-1):
-                #o = sigmoid_at_hidden_nodes[s] * w2T[s,o]
-                #net_input_at_output_node += o
-                net_input_at_output_node += (sigmoid_at_hidden_nodes[s] * w2T[s,o])
+            for s in range(0,sigmoid_at_hidden_nodes.size+1):
+                #if hidden node is a bias node
+                if s == sigmoid_at_hidden_nodes.size:
+                    net_input_at_output_node += (1 * w2[o,s])
+                else:
+                    net_input_at_output_node += (sigmoid_at_hidden_nodes[s] * w2[o,s])
             sig_o = sigmoid(net_input_at_output_node)
-            np.append(sigmoid_at_output_nodes,sig_o)
+            sigmoid_at_output_nodes = np.append(sigmoid_at_output_nodes,sig_o)        
+            
         
         """
-        #all the values in 'sigmoid_at_output_nodes' are in decimals
-        #before calculating the error at output, we need to convert it to an output comparable to the true labels
-        #that is, in the form of 0's and 1's
-        #therefore, we need to consider the highest value in 'sigmoid_at_output_nodes' as the correct output
-        index_of_label = np.argmax(sigmoid_at_output_nodes)
-        observed_label = ""
-        for i in range(0,9):
-            if i == index_of_label:
-                observed_label += 1
-            else:
-                observed_label += 0
+        #printing sigmoid_at_output_node
+        print "TE # : "
+        print te
+        for x in range(0,sigmoid_at_output_nodes.size):            
+            print x
+            print sigmoid_at_output_nodes[x]
         """
         
         #compute the error at each output node
         #compute the total error at output by summing the individual errors        
         total_error = 0        
-        for o in range(0,n_class-1):
+        for o in range(0,n_class):
             #error at each output node is the square of difference between the observed and expected output
             if( training_label[te] == 0 or 
                 training_label[te] == 1 or
@@ -361,27 +367,53 @@ def nnObjFunction(params, *args):
                 training_label[te] == 7 or
                 training_label[te] == 8 or
                 training_label[te] == 9):
-                error = math.pow((1.0 - sigmoid_at_output_nodes[o]),2)
+                error = math.pow((1 - sigmoid_at_output_nodes[o]),2)
             else:
-                error = math.pow((0.0 - sigmoid_at_output_nodes[o]),2)
-            
-            #total error at this output node
+                error = math.pow((0 - sigmoid_at_output_nodes[o]),2)
             total_error += error 
-        
-        #total error for this training example
         error_for_training_example = total_error / 2
-    
-    #total error for the entire training data
+        
+        #calculating the gradient of error for every training example
+        #formula is -(1-)
+        
     final_error += error_for_training_example
     
     #error value for all training data together
     #=sum of errors for all training examples / number of training examples 
-    obj_val = final_error / training_data.shape[0]  #to be returned
+    intermediate_obj_val = final_error / training_data.shape[0]    
+    #obj_val ie equation 15 over intermediate_obj_val
+    #obj_val = intermediate_obj_val + regularization term
+    regularization_term = 0
+    #calculating regularization of w1
+    r1 = 0
+    for i in range(0,n_hidden):
+        r2 = 0
+        for j in range(0,n_input+1):
+            r2 += math.pow(w1[j,i],2)
+        r1 += r2
     
+    #calculating regularization of w1
+    r3= 0
+    for l in range(0,n_class):
+        r4 = 0
+        for j in range(0,n_hidden+1):
+            r4 += math.pow(w2[l,j],2)
+        r3 += r4
+    
+    total_r = (lambdaval / (2 * training_data.shape[0])) * (r1 + r3)
+    obj_val = intermediate_obj_val + total_r
+    
+    #computing error gradiance
+    #computing the gradient wrt w2 in the output layer
+    grad_output_nodes = np.array([])
+    for l in range(0,n_class):
+        delta_l = (training_label[te] - sigmoid_at_output_nodes[l]) * (1 - sigmoid_at_output_nodes[l]) * sigmoid_at_output_nodes[l]
+        gw2 = delta_l * sigmoid_at_hidden_nodes[]
         
     #compute the derivation of error functions and gradient of the error
     #first, derivation of error function wrt weights from hidden to output nodes
-        
+    
+    
     #second, derivation of error function wrt weights from input to hidden nodes
     
 
@@ -424,6 +456,7 @@ def nnPredict(w1,w2,data):
 
 
 """**************Neural Network Script Starts here********************************"""
+
 import os
 os.system('cls')
 
